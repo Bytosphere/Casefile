@@ -1,0 +1,32 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test
+*.test
+
+# Code Coverage
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+# Dependency Directories
+# vendor/
+
+# Go Workspace
+go.work
+go.work.sum
+
+# Environment Files
+.env
+
+# Editor/IDE
+.idea/
+.vscode/
+
+# LLM
+.claude/
