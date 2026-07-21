@@ -1,9 +1,12 @@
 package main
 
-import "casefile/internal/command"
+import (
+	"casefile/internal/command"
+	"os"
+)
 
 func main() {
 	if err := command.Execute(); err != nil {
-		panic(err)
+		os.Exit(0)
 	}
 }
