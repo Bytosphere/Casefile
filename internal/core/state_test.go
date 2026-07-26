@@ -108,7 +108,7 @@ func TestState_AbsolutePath_UnreachableError(t *testing.T) {
 func TestState_Integration(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	// Create state
+	// Create State
 	state, err := NewState(tmpDir)
 	if err != nil {
 		t.Fatalf("NewState failed: %v", err)
@@ -125,7 +125,7 @@ func TestState_Integration(t *testing.T) {
 		t.Error("AbsolutePath() returned empty or error marker")
 	}
 
-	// Verify the path contains .casefile
+	// Verify the path contains `.casefile`
 	expectedDir := ".casefile"
 	if len(path) < len(expectedDir) || path[len(path)-len(expectedDir):] != expectedDir {
 		t.Errorf("Path() = %v, expected to end with %s", path, expectedDir)

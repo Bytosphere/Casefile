@@ -1,5 +1,7 @@
-# Casefile State
+# Casefile
 .casefile/
+casefile.config.yaml
+casefile-*.config.yaml
 
 # Binaries
 *.exe

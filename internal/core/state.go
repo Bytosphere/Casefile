@@ -10,8 +10,9 @@ import (
 var ErrStateExists = errors.New("state already exists")
 
 type State struct {
-	path string
-	db   *database.Database
+	path   string
+	config *Config
+	db     *database.Database
 }
 
 // NewState creates a new State from a specific root path.
@@ -24,6 +25,9 @@ func NewState(path string) (*State, error) {
 		return nil, err
 	}
 
+	// Create the default configuration file at the working directory.
+	config, err := NewConfig(path, "Default")
+
 	// Set up the database.
 	db, err := database.Connect(filepath.Join(root, "store.db"))
 	if err != nil {
@@ -35,7 +39,19 @@ func NewState(path string) (*State, error) {
 		return nil, err
 	}
 
-	return &State{path: path, db: db}, nil
+	return &State{
+		path:   root,
+		config: config,
+		db:     db,
+	}, nil
+}
+
+func (s *State) Config() *Config {
+	return s.config
+}
+
+func (s *State) DB() *database.Database {
+	return s.db
 }
 
 func (s *State) Path() string {
