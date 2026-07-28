@@ -14,41 +14,35 @@ Sets up everything a project needs before it can be scanned.
 The persistence layer everything else in Casefile is built on.
 
 - Initial schema covering Issues and their metadata.
-- A migration mechanism so the schema can evolve across later versions
-  without breaking existing state.
+- A migration mechanism so the schema can evolve across later versions without breaking existing state.
 
 ### Configuration
 
 The baseline config file `init` writes out.
 
 - Defines where state lives, default provider, default intent.
-- Structured so later versions (providers, intents) extend it rather than
-  redefine it.
+- Structured so later versions (providers, intents) extend it rather than redefine it.
 
 ---
 
-## Version 0.2.0 — Agent Provider
+## Version 0.2.0 — Agent ProviderConfig
 
-Establishes how Casefile talks to a model, even though only one built-in
-provider exists at this stage. Getting the abstraction right now means later
-provider work is additive rather than a rewrite.
+Establishes how Casefile talks to a model, even though only one built-in provider exists at this stage.
+Getting the abstraction right now means later provider work is additive rather than a rewrite.
 
-### Provider: Foundation
+### ProviderConfig: Foundation
 
-A defined interface between Casefile's orchestration logic and whatever
-backend actually generates findings.
+A defined interface between Casefile's orchestration logic and whatever backend actually generates findings.
 
 - Request/response contract agents are built against.
-- Kept intentionally provider-agnostic, even with a single implementation
-  behind it.
+- Kept intentionally provider-agnostic, even with a single implementation behind it.
 
-### Provider: Built-in Default
+### ProviderConfig: Built-in Default
 
 The one concrete implementation of that interface for now.
 
 - Hardcoded to a single provider/model.
-- Wired in as the only option — multi-provider selection comes later, once
-  real usage has exercised this interface.
+- Wired in as the only option — multi-provider selection comes later, once real usage has exercised this interface.
 
 ---
 
@@ -56,8 +50,7 @@ The one concrete implementation of that interface for now.
 
 ### Command: `casefile scan`
 
-Runs the provider from 0.2.0 against a single built-in intent to produce
-Issues, using the storage layer from 0.1.0.
+Runs the provider from 0.2.0 against a single built-in intent to produce Issues, using the storage layer from 0.1.0.
 
 - Walks the repo.
 - Writes Issues to the database.
@@ -81,8 +74,7 @@ The primary way to see what a scan found.
 
 ### Flags: List Filtering
 
-Filtering lives in the same version as `list` itself rather than being
-bolted on later.
+Filtering lives in the same version as `list` itself rather than being bolted on later.
 
 - Combinable in a single invocation.
 
@@ -139,19 +131,17 @@ Keeps closed Issues out of the way without hiding them entirely.
 
 ## Version 0.7.0 — Fingerprints
 
-A dedicated milestone to design and build the mechanism that lets Casefile
-tell whether an Issue still applies after code changes. This is the
-foundation `update` (next milestone) depends on, so it's scoped on its own
-rather than bundled in.
+A dedicated milestone to design and build the mechanism that lets Casefile tell whether an Issue still applies after
+code changes. This is the foundation `update` (next milestone) depends on, so it's scoped on its own rather than
+bundled in.
 
 ### Design: Fingerprint Strategy
 
 What identifies an Issue beyond file/line, since line numbers drift.
 
-- Candidates: hash of surrounding code context, AST-node-level fingerprint,
-  or a combination.
-- Needs a tolerance model — how much surrounding code can change before a
-  fingerprint is considered "broken" vs. "still matches".
+- Candidates: hash of surrounding code context, AST-node-level fingerprint, or a combination.
+- Needs a tolerance model — how much surrounding code can change before a fingerprint is considered "broken"
+  vs. "still matches".
 
 ### Storage: Fingerprint Persistence & Comparison
 
@@ -164,8 +154,7 @@ Persists fingerprints and builds the diff logic later commands will call.
 
 ## Version 0.8.0 — Verified Re-evaluation
 
-The part that makes Casefile more than a one-shot linter, built on the
-fingerprinting work above.
+The part that makes Casefile more than a one-shot linter, built on the fingerprinting work above.
 
 ### Command: `casefile update`
 
@@ -184,8 +173,8 @@ Preview mode for `update`.
 
 ## Version 0.9.0 — Intents
 
-Intents get their own version rather than riding along with scan or provider
-work, since they need a real configuration mechanism of their own.
+Intents get their own version rather than riding along with scan or provider work, since they need a real
+configuration mechanism of their own.
 
 ### Concept: Intents
 
@@ -199,15 +188,13 @@ severity.
 The mechanism that lets users define intents beyond the built-ins.
 
 - New section of `.casefile/config` dedicated to intent definitions.
-- Selected via `scan --intent <name>` (repeatable, for multiple intents per
-  scan).
+- Selected via `scan --intent <name>` (repeatable, for multiple intents per scan).
 
 ---
 
-## Version 0.10.0 — Multi-Provider Support
+## Version 0.10.0 — Multi-ProviderConfig Support
 
-Builds directly on the provider abstraction from 0.2.0 to support more than
-the single built-in provider.
+Builds directly on the provider abstraction from 0.2.0 to support more than the single built-in provider.
 
 ### Architecture: Additional Providers
 
@@ -215,7 +202,7 @@ Implements the 0.2.0 interface for more backends.
 
 - At least one additional provider alongside the built-in default.
 
-### Config: Provider Selection
+### Config: ProviderConfig Selection
 
 Chooses provider and model outside of code.
 
@@ -225,22 +212,19 @@ Chooses provider and model outside of code.
 
 ## Version 0.11.0 — QA Test-Case Ingestion
 
-The second half of Casefile's stated scope: using existing test cases to
-focus a scan.
+The second half of Casefile's stated scope: using existing test cases to focus a scan.
 
 ### Feature: Test-Case Ingestion
 
 Accepts a Markdown file describing test cases for a feature.
 
-- Exact entry point (a `scan` flag vs. a dedicated subcommand) decided during
-  implementation.
+- Exact entry point (a `scan` flag vs. a dedicated subcommand) decided during implementation.
 
 ### Behavior: Focused Scanning
 
 Uses ingested test cases to steer the agent's attention.
 
-- Findings tagged so exports can distinguish QA-driven results from general
-  scans.
+- Findings tagged so exports can distinguish QA-driven results from general scans.
 
 ---
 
