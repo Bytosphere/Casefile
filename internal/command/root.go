@@ -5,7 +5,7 @@ import (
 )
 
 // version is the main version of the CLI.
-var version = "0.1.0"
+var version = "0.2.0"
 
 // rootCmd is the command that all subcommands belong to.
 var rootCmd = &cobra.Command{
