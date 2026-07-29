@@ -46,54 +46,68 @@ The one concrete implementation of that interface for now.
 
 ---
 
-## Version 0.3.0 — First Scan
+## Version 0.3.0 — Issue Management
 
-### Command: `casefile scan`
+Covers the full loop from producing Issues to reviewing them: `scan` generates and stores Issues, `list` is how
+they're reviewed, and terminal formatting is what makes `list` usable. These are grouped in one milestone because
+none of the three is meaningfully useful on its own.
 
-Runs the provider from 0.2.0 against a single built-in intent to produce Issues, using the storage layer from 0.1.0.
-
-- Walks the repo.
-- Writes Issues to the database.
-
-### Schema: Issue Model
+### Issue
 
 The fields that make up an Issue, since every later command builds on it.
 
-- Sequential ID, title, description, severity, file, line, status, created date.
-- Placeholder field for a code-context fingerprint (built out in 0.6.0).
+| Field         | Notes                                 | Values                              |
+|---------------|---------------------------------------|-------------------------------------|
+| `id`          | Sequential identifier for each Issue. | -                                   |
+| `title`       | Short, one-line summary.              | -                                   |
+| `description` | Fuller explanation from the provider. | -                                   |
+| `severity`    | The Issue's severity on the codebase. | `Low`, `Medium`, `High`, `Critical` |
+| `file`        | Path relative to repo root.           | -                                   |
+| `line`        | Line number at scan time.             | -                                   |
+| `status`      | The status of the Issue.              | `Open`, `Closed`                    |
+| `created_at`  | Timestamp.                            | -                                   |
 
----
+### Command: `casefile scan`
 
-## Version 0.4.0 — Issue Listing & Filtering
+Runs the provider from v0.2.0 against a single built-in intent to produce Issues, using the storage layer from v0.1.0.
+
+- Walks the repo, respecting `.gitignore`.
+- Parses provider output into Issue records and writes them to the database.
+- Prints a short summary (count found, by severity) — full detail is `list`'s job.
+
+#### Re-Scan Behavior
+
+Without fingerprinting (v0.6.0) there's no reliable way to tell whether a re-detected issue is the same one already on
+file. For 0.3.0, `scan` performs a naive dedup — skip creating a new Issue if an open Issue already matches on
+`(file, line, title)` — rather than appending duplicates on every run.
 
 ### Command: `casefile list`
 
 The primary way to see what a scan found.
 
-- Sorted by severity by default.
+- Defaults to `status: Open`, sorted by severity (`Critical` to `Low`).
+- Multiple filters combine with AND (e.g. `--severity High --status Open` requires both).
+- Provides filter flags to organize results.
 
-### Flags: List Filtering
+#### Filter Criteria
 
-Filtering lives in the same version as `list` itself rather than being bolted on later.
-
-- Combinable in a single invocation.
-
-#### Filters
-
-- `--severity`
-- `--status`
-- `--file`.
+| Criterion    | Description                                                     |
+|--------------|-----------------------------------------------------------------|
+| `--severity` | Filter by severity level.                                       |
+| `--status`   | Filter by Issue status.                                         |
+| `--file`     | Filter by filename (substring match against the relative path). |
 
 ### Output: Terminal Formatting
 
 A readability pass on `list` output.
 
-- Aligned columns.
-- Color by severity.
+- Aligned columns: ID, severity, file:line, title (truncated to terminal width).
+- Color by severity, using a fixed mapping consistent with future export/dashboard use.
+- Respects `NO_COLOR` and non-TTY output (colors strip automatically when piped).
 
 ---
 
-## Version 0.5.0 — Export
+## Version 0.4.0 — Export
 
 ### Command: `casefile export`
 
@@ -111,7 +125,7 @@ The actual shape of the exported document.
 
 ---
 
-## Version 0.6.0 — Issue Lifecycle
+## Version 0.5.0 — Issue Lifecycle
 
 ### Command: `casefile close`
 
@@ -129,7 +143,7 @@ Keeps closed Issues out of the way without hiding them entirely.
 
 ---
 
-## Version 0.7.0 — Fingerprints
+## Version 0.6.0 — Fingerprints
 
 A dedicated milestone to design and build the mechanism that lets Casefile tell whether an Issue still applies after
 code changes. This is the foundation `update` (next milestone) depends on, so it's scoped on its own rather than
@@ -152,7 +166,7 @@ Persists fingerprints and builds the diff logic later commands will call.
 
 ---
 
-## Version 0.8.0 — Verified Re-evaluation
+## Version 0.7.0 — Verified Re-evaluation
 
 The part that makes Casefile more than a one-shot linter, built on the fingerprinting work above.
 
@@ -171,7 +185,7 @@ Preview mode for `update`.
 
 ---
 
-## Version 0.9.0 — Intents
+## Version 0.8.0 — Intents
 
 Intents get their own version rather than riding along with scan or provider work, since they need a real
 configuration mechanism of their own.
@@ -192,7 +206,7 @@ The mechanism that lets users define intents beyond the built-ins.
 
 ---
 
-## Version 0.10.0 — Multi-ProviderConfig Support
+## Version 0.9.0 — Multi-ProviderConfig Support
 
 Builds directly on the provider abstraction from 0.2.0 to support more than the single built-in provider.
 
@@ -210,7 +224,7 @@ Chooses provider and model outside of code.
 
 ---
 
-## Version 0.11.0 — QA Test-Case Ingestion
+## Version 0.10.0 — QA Test-Case Ingestion
 
 The second half of Casefile's stated scope: using existing test cases to focus a scan.
 
@@ -228,7 +242,7 @@ Uses ingested test cases to steer the agent's attention.
 
 ---
 
-## Version 0.12.0 — Polish & Output Formats
+## Version 0.11.0 — Polish & Output Formats
 
 ### Flag: `--json`
 
