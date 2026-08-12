@@ -2,6 +2,8 @@ package command
 
 import (
 	"casefile/internal/core"
+	"casefile/internal/core/tool"
+	"casefile/internal/provider"
 	"casefile/internal/provider/openai"
 	"context"
 	"fmt"
@@ -31,9 +33,14 @@ func runChat(_ *cobra.Command, args []string) error {
 	config := state.Profile().Config()
 	providerConfig := config.Provider
 
-	provider := openai.New(providerConfig)
+	p := openai.New(providerConfig)
 
-	res, err := provider.Complete(context.Background(), args[0])
+	req := provider.Request{
+		Prompt: args[0],
+		Tools:  make([]tool.Tool, 0),
+	}
+
+	res, err := p.Complete(context.Background(), req)
 	if err != nil {
 		return err
 	}
