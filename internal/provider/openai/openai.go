@@ -3,6 +3,7 @@ package openai
 import (
 	"bytes"
 	"casefile/internal/core"
+	"casefile/internal/provider"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -28,9 +29,12 @@ func New(cfg core.ProviderConfig) *Provider {
 	}
 }
 
-func (p *Provider) Complete(ctx context.Context, prompt string) (string, error) {
+func (p *Provider) Complete(ctx context.Context, req provider.Request) (string, error) {
 	// Prepare the payload for OpenAI.
-	payload := NewChatRequest(p.Model, prompt)
+	payload, err := NewChatRequest(p.Model, req)
+	if err != nil {
+		return "", fmt.Errorf("create payload: %w", err)
+	}
 
 	body, err := json.Marshal(payload)
 	if err != nil {
