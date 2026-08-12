@@ -15,18 +15,15 @@ func TestProfile_Name(t *testing.T) {
 }
 
 func TestProfile_Config(t *testing.T) {
-	config := Config{Profile: "test", Data: ConfigData{Provider: "openai", Intent: "test"}}
+	config := Config{Provider: ProviderConfig{Name: "openai"}, Intent: "test"}
 	profile := Profile{name: "test", config: config}
 
 	got := profile.Config()
-	if got.Profile != "test" {
-		t.Errorf("expected config.Profile to be 'test', got %q", got.Profile)
+	if got.Provider.Name != "openai" {
+		t.Errorf("expected config.Provider.Name to be 'openai', got %q", got.Provider.Name)
 	}
-	if got.Data.Provider != "openai" {
-		t.Errorf("expected config.Data.ProviderConfig to be 'openai', got %q", got.Data.Provider)
-	}
-	if got.Data.Intent != "test" {
-		t.Errorf("expected config.Data.Intent to be 'test', got %q", got.Data.Intent)
+	if got.Intent != "test" {
+		t.Errorf("expected config.Intent to be 'test', got %q", got.Intent)
 	}
 }
 
@@ -195,7 +192,7 @@ func TestLoadProfile_Integration(t *testing.T) {
 
 	// Create a config file with specific values
 	configPath := filepath.Join(tmpDir, "casefile.config.yaml")
-	err := os.WriteFile(configPath, []byte("provider: openai\nintent: testing\n"), 0644)
+	err := os.WriteFile(configPath, []byte("provider:\n  name: openai\nintent: testing\n"), 0644)
 	if err != nil {
 		t.Fatalf("failed to create config file: %v", err)
 	}
@@ -213,10 +210,10 @@ func TestLoadProfile_Integration(t *testing.T) {
 
 	// Verify the config data
 	config := profile.Config()
-	if config.Data.Provider != "openai" {
-		t.Errorf("expected provider 'openai', got %q", config.Data.Provider)
+	if config.Provider.Name != "openai" {
+		t.Errorf("expected provider 'openai', got %q", config.Provider.Name)
 	}
-	if config.Data.Intent != "testing" {
-		t.Errorf("expected intent 'testing', got %q", config.Data.Intent)
+	if config.Intent != "testing" {
+		t.Errorf("expected intent 'testing', got %q", config.Intent)
 	}
 }

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"casefile/internal/core/tool"
 	"casefile/internal/database"
 	"errors"
 	"os"
@@ -13,6 +14,7 @@ type State struct {
 	path    string
 	profile *Profile
 	db      *database.Database
+	tools   *tool.Registry
 }
 
 // NewState creates a new State from a specific root path.
@@ -59,6 +61,7 @@ func NewState(path string) (*State, error) {
 		path:    root,
 		profile: profile,
 		db:      db,
+		tools:   tool.NewRegistry(),
 	}, nil
 }
 
@@ -86,6 +89,7 @@ func LoadState() (*State, error) {
 		path:    path,
 		profile: profile,
 		db:      db,
+		tools:   tool.NewRegistry(),
 	}, nil
 }
 

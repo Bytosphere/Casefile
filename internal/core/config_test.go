@@ -18,14 +18,11 @@ func TestConfig_NewConfig_Success(t *testing.T) {
 	if config == nil {
 		t.Fatal("expected config to be non-nil")
 	}
-	if config.Profile != "Default" {
-		t.Errorf("expected profile to be 'Default', got %q", config.Profile)
+	if config.Provider.Name != "" {
+		t.Errorf("expected provider name to be empty, got %q", config.Provider.Name)
 	}
-	if config.Data.Provider != "" {
-		t.Errorf("expected provider to be empty, got %q", config.Data.Provider)
-	}
-	if config.Data.Intent != "" {
-		t.Errorf("expected intent to be empty, got %q", config.Data.Intent)
+	if config.Intent != "" {
+		t.Errorf("expected intent to be empty, got %q", config.Intent)
 	}
 
 	// Verify config file was created with correct filename
@@ -70,8 +67,12 @@ func TestConfig_LoadConfig_Success(t *testing.T) {
 	if config == nil {
 		t.Fatal("expected config to be non-nil")
 	}
-	if config.Profile != "Default" {
-		t.Errorf("expected profile to be 'Default', got %q", config.Profile)
+	// Verify the config has expected default values
+	if config.Provider.Name != "" {
+		t.Errorf("expected provider name to be empty, got %q", config.Provider.Name)
+	}
+	if config.Intent != "" {
+		t.Errorf("expected intent to be empty, got %q", config.Intent)
 	}
 }
 
@@ -106,8 +107,11 @@ func TestConfig_LoadConfig_Integration(t *testing.T) {
 	}
 
 	// Verify the config was created with default values
-	if config.Profile != "Default" {
-		t.Errorf("expected profile 'Default', got %q", config.Profile)
+	if config.Provider.Name != "" {
+		t.Errorf("expected provider name to be empty, got %q", config.Provider.Name)
+	}
+	if config.Intent != "" {
+		t.Errorf("expected intent to be empty, got %q", config.Intent)
 	}
 
 	// Load the config
@@ -117,13 +121,10 @@ func TestConfig_LoadConfig_Integration(t *testing.T) {
 	}
 
 	// Verify the loaded config matches
-	if loadedConfig.Profile != config.Profile {
-		t.Errorf("expected profile %q, got %q", config.Profile, loadedConfig.Profile)
+	if loadedConfig.Provider.Name != config.Provider.Name {
+		t.Errorf("expected provider name %q, got %q", config.Provider.Name, loadedConfig.Provider.Name)
 	}
-	if loadedConfig.Data.Provider != config.Data.Provider {
-		t.Errorf("expected provider %q, got %q", config.Data.Provider, loadedConfig.Data.Provider)
-	}
-	if loadedConfig.Data.Intent != config.Data.Intent {
-		t.Errorf("expected intent %q, got %q", config.Data.Intent, loadedConfig.Data.Intent)
+	if loadedConfig.Intent != config.Intent {
+		t.Errorf("expected intent %q, got %q", config.Intent, loadedConfig.Intent)
 	}
 }
