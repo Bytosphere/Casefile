@@ -3,6 +3,7 @@ package core
 import (
 	"casefile/internal/core/tool"
 	"casefile/internal/database"
+	"casefile/internal/tools"
 	"errors"
 	"os"
 	"path/filepath"
@@ -51,12 +52,6 @@ func NewState(path string) (*State, error) {
 		return nil, err
 	}
 
-	// TODO: Test query. Remove later.
-	_, err = db.Exec("SELECT 1")
-	if err != nil {
-		return nil, err
-	}
-
 	return &State{
 		path:    root,
 		profile: profile,
@@ -84,6 +79,9 @@ func LoadState() (*State, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	registry := tool.NewRegistry()
+	registry.Register(tools.Search())
 
 	return &State{
 		path:    path,
