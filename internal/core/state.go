@@ -82,12 +82,13 @@ func LoadState() (*State, error) {
 
 	registry := tool.NewRegistry()
 	registry.Register(tools.Search())
+	registry.Register(tools.File())
 
 	return &State{
 		path:    path,
 		profile: profile,
 		db:      db,
-		tools:   tool.NewRegistry(),
+		tools:   registry,
 	}, nil
 }
 
