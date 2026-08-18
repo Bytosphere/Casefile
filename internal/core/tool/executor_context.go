@@ -22,6 +22,11 @@ func NewExecutorContext(ctx context.Context, root string) *ExecutorContext {
 	return &ExecutorContext{root: root, ctx: ctx}
 }
 
+// Root returns the project root directory this context is bound to.
+func (ex *ExecutorContext) Root() string {
+	return ex.root
+}
+
 // ResolvePath enforces the path boundaries to root. It returns the resolved path upon
 // success.
 func (ex *ExecutorContext) ResolvePath(path string) (string, error) {
