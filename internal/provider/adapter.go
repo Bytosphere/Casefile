@@ -7,5 +7,5 @@ import "casefile/internal/core/tool"
 type Adapter interface {
 	// Transform takes a tool and transforms into the desired shape that the provider
 	// expects.
-	Transform(t *tool.Tool, target any) (string, error)
+	Transform(t *tool.Tool, target any) error
 }

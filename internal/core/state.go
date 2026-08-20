@@ -104,6 +104,11 @@ func (s *State) DB() *database.Database {
 	return s.db
 }
 
+// Tools returns the tool registry available to this State.
+func (s *State) Tools() *tool.Registry {
+	return s.tools
+}
+
 func (s *State) Path() string {
 	return s.path
 }
