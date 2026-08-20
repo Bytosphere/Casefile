@@ -149,6 +149,40 @@ func TestRegistry_Get_AfterOverwrite(t *testing.T) {
 	}
 }
 
+func TestRegistry_All_Empty(t *testing.T) {
+	registry := NewRegistry()
+
+	all := registry.All()
+
+	if len(all) != 0 {
+		t.Errorf("expected 0 tools, got %d", len(all))
+	}
+}
+
+func TestRegistry_All_ReturnsAllRegistered(t *testing.T) {
+	registry := NewRegistry()
+
+	tool1 := &Tool{Name: "tool-one", Description: "First tool"}
+	tool2 := &Tool{Name: "tool-two", Description: "Second tool"}
+
+	registry.Register(tool1)
+	registry.Register(tool2)
+
+	all := registry.All()
+
+	if len(all) != 2 {
+		t.Fatalf("expected 2 tools, got %d", len(all))
+	}
+
+	names := map[string]bool{}
+	for _, t := range all {
+		names[t.Name] = true
+	}
+	if !names["tool-one"] || !names["tool-two"] {
+		t.Errorf("expected both tool-one and tool-two in All(), got %v", names)
+	}
+}
+
 func TestRegistry_Integration(t *testing.T) {
 	registry := NewRegistry()
 

@@ -6,6 +6,6 @@ import "casefile/internal/core/tool"
 // Each Provider implementation is responsible for translating this into
 // its own wire format via its Adapter.
 type Request struct {
-	Prompt string
-	Tools  []tool.Tool
+	Messages []Message
+	Tools    []tool.Tool
 }

@@ -21,3 +21,12 @@ func (r *Registry) Get(name string) (*Tool, bool) {
 	tool, ok := r.tools[name]
 	return tool, ok
 }
+
+// All returns every registered Tool.
+func (r *Registry) All() []Tool {
+	tools := make([]Tool, 0, len(r.tools))
+	for _, t := range r.tools {
+		tools = append(tools, *t)
+	}
+	return tools
+}

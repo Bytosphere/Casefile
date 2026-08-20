@@ -36,8 +36,8 @@ func runChat(_ *cobra.Command, args []string) error {
 	p := openai.New(providerConfig)
 
 	req := provider.Request{
-		Prompt: args[0],
-		Tools:  make([]tool.Tool, 0),
+		Messages: []provider.Message{{Role: provider.RoleUser, Content: args[0]}},
+		Tools:    make([]tool.Tool, 0),
 	}
 
 	res, err := p.Complete(context.Background(), req)
@@ -45,7 +45,7 @@ func runChat(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println(res)
+	fmt.Println(res.Content)
 
 	return nil
 }

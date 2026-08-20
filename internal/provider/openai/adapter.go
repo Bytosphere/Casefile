@@ -4,10 +4,13 @@ import (
 	"fmt"
 
 	"casefile/internal/core/tool"
+	"casefile/internal/provider"
 )
 
 // Adapter implements provider.Adapter for OpenAI-compatible backends.
 type Adapter struct{}
+
+var _ provider.Adapter = (*Adapter)(nil)
 
 func (a *Adapter) Transform(t *tool.Tool, target any) error {
 	if t == nil {

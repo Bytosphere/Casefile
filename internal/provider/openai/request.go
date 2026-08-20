@@ -1,6 +1,11 @@
 package openai
 
-import "casefile/internal/provider"
+import (
+	"encoding/json"
+	"fmt"
+
+	"casefile/internal/provider"
+)
 
 // MessageRequest is a single message in the conversation sent to the provider.
 type MessageRequest struct {
@@ -60,7 +65,8 @@ type ChatRequest struct {
 	Tools    []Tool           `json:"tools,omitempty"`
 }
 
-// NewChatRequest builds a single-turn user request with no tools attached.
+// NewChatRequest builds a multi-turn request from req.Messages, transforming
+// any registered tools into the wire Tool shape.
 func NewChatRequest(model string, req provider.Request) (ChatRequest, error) {
 	adapter := new(Adapter)
 	tools := make([]Tool, 0)
@@ -74,14 +80,49 @@ func NewChatRequest(model string, req provider.Request) (ChatRequest, error) {
 		tools = append(tools, t)
 	}
 
+	messages := make([]MessageRequest, 0, len(req.Messages))
+	for _, m := range req.Messages {
+		mr, err := toMessageRequest(m)
+		if err != nil {
+			return ChatRequest{}, err
+		}
+		messages = append(messages, mr)
+	}
+
 	return ChatRequest{
-		Model: model,
-		Messages: []MessageRequest{
-			{
-				Role:    "user",
-				Content: req.Prompt,
-			},
-		},
-		Tools: tools,
+		Model:    model,
+		Messages: messages,
+		Tools:    tools,
 	}, nil
+}
+
+// toMessageRequest translates a provider-agnostic Message into the wire
+// MessageRequest shape, marshaling any tool call arguments back to JSON.
+func toMessageRequest(m provider.Message) (MessageRequest, error) {
+	mr := MessageRequest{
+		Role:       string(m.Role),
+		Content:    m.Content,
+		ToolCallID: m.ToolCallID,
+	}
+
+	if len(m.ToolCalls) > 0 {
+		toolCalls := make([]ToolCall, 0, len(m.ToolCalls))
+		for _, tc := range m.ToolCalls {
+			args, err := json.Marshal(tc.Arguments)
+			if err != nil {
+				return MessageRequest{}, fmt.Errorf("marshal tool call arguments: %w", err)
+			}
+			toolCalls = append(toolCalls, ToolCall{
+				ID:   tc.ID,
+				Type: "function",
+				Function: FunctionCall{
+					Name:      tc.Name,
+					Arguments: string(args),
+				},
+			})
+		}
+		mr.ToolCalls = toolCalls
+	}
+
+	return mr, nil
 }
